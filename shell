@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-container="apache"
+container="wp"
 if [ "$2" != "" ]
 then
     container=$2
