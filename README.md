@@ -140,6 +140,12 @@ Or to list installed plugins:
 docker-compose run --rm wpcli plugin list
 ```
 
+Or to search-replace:
+
+```
+docker-compose run --rm wpcli search-replace 'mysite.com' 'mysite.test'
+```
+
 For an easier usage you may consider adding an alias for the CLI:
 
 ```
