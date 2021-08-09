@@ -1,6 +1,6 @@
 # WPDC - WordPress Docker Compose
 
-Easy WordPress development with Docker and Docker Compose.
+Easy setup local WordPress development enviroment with Docker and Docker Compose.
 
 With this project you can quickly run the following:
 
@@ -8,20 +8,66 @@ With this project you can quickly run the following:
 - [phpMyAdmin](https://hub.docker.com/r/phpmyadmin/phpmyadmin/)
 - [MySQL](https://hub.docker.com/_/mysql/)
 
-Contents:
-
-- [Requirements](#requirements)
-- [Configuration](#configuration)
-- [Installation](#installation)
-- [Usage](#usage)
-
 ## Requirements
 
 Make sure you have the latest versions of **Docker** and **Docker Compose** installed on your machine.
 
-Clone this repository or copy the files from this repository into a new folder. In the **docker-compose.yml** file you may change the IP address (in case you run multiple containers) or the database from MySQL to MariaDB.
+**MacOS:**
+
+Install [Docker](https://docs.docker.com/docker-for-mac/install/), [Docker-compose](https://docs.docker.com/compose/install/#install-compose) and [Docker-sync](https://github.com/EugenMayer/docker-sync/wiki/docker-sync-on-OSX).
+
+**Windows:**
+
+Install [Docker](https://docs.docker.com/docker-for-windows/install/), [Docker-compose](https://docs.docker.com/compose/install/#install-compose) and [Docker-sync](https://github.com/EugenMayer/docker-sync/wiki/docker-sync-on-Windows).
+
+**Linux:**
+
+Install [Docker](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/) and [Docker-compose](https://docs.docker.com/compose/install/#install-compose).
 
 Make sure to [add your user to the `docker` group](https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user) when using Linux.
+
+
+## How to use
+
+Execute in your terminal, change the *WPFOLDER* to use the name of your project:
+
+### Clone repository
+
+```
+git clone https://github.com/baracatuemura/wordpress-docker-compose.git WPFOLDER
+```
+### For new WordPress instalation 
+
+```
+cd WPFOLDER
+cp env.example .env
+./start
+cp -R wp-app/wp-content/themes/ src/
+cp -R wp-app/wp-content/plugins/ src/
+```
+
+In browser go to http://127.0.0.1
+
+### For WordPress existing source
+
+```
+cd WPFOLDER
+cp env.example .env
+mkdir wp-data
+```
+
+* copy the database dump to `wp-data` folder
+* copy `themes`, `plugins` and `uploads` folders to `src` folder
+
+```
+./start
+```
+#### Replace data base URLs 
+```
+docker-compose run --rm wpcli search-replace 'http://mysite.com' 'http://127.0.0.1'
+```
+
+In browser go to http://127.0.0.1
 
 ## Configuration
 
@@ -33,22 +79,6 @@ cp env.example .env
 
 Edit the `.env` file to change the default IP address, MySQL root password and WordPress database name.
 
-## Installation
-
-Open a terminal and `cd` to the folder in which `docker-compose.yml` is saved and run:
-
-```
-docker-compose up
-```
-
-This creates two new folders next to your `docker-compose.yml` file.
-
-* `wp-data` – used to store and restore database dumps
-* `wp-app` – the location of your WordPress application
-
-The containers are now built and running. You should be able to access the WordPress installation with the configured IP in the browser address. By default it is `http://127.0.0.1`.
-
-For convenience you may add a new entry into your hosts file.
 
 ## Usage
 
@@ -57,10 +87,23 @@ For convenience you may add a new entry into your hosts file.
 You can start the containers with the `up` command in daemon mode (by adding `-d` as an argument) or by using the `start` command:
 
 ```
+./start
+```
+or
+```
+docker-compose up
+```
+or
+```
 docker-compose start
 ```
 
+
 ### Stopping containers
+```
+./stop
+```
+or
 
 ```
 docker-compose stop
@@ -74,54 +117,20 @@ To stop and remove all the containers use the`down` command:
 docker-compose down
 ```
 
-Use `-v` if you need to remove the database volume which is used to persist the database:
+To Stops containers and removes containers, networks, volumes, and images created to the specific project
+```
+./kill
+```
+or
 
 ```
 docker-compose down -v
-```
-
-### Project from existing source
-
-Copy the `docker-compose.yml` file into a new directory. In the directory you create two folders:
-
-* `wp-data` – here you add the database dump
-* `wp-app` – here you copy your existing WordPress code
-
-You can now use the `up` command:
-
-```
-docker-compose up
-```
-
-This will create the containers and populate the database with the given dump. You may set your host entry and change it in the database, or you simply overwrite it in `wp-config.php` by adding:
-
-```
-define('WP_HOME','http://wp-app.local');
-define('WP_SITEURL','http://wp-app.local');
 ```
 
 ### Creating database dumps
 
 ```
 ./export.sh
-```
-
-### Developing a Theme
-
-Configure the volume to load the theme in the container in the `docker-compose.yml`:
-
-```
-volumes:
-  - ./theme-name/trunk/:/var/www/html/wp-content/themes/theme-name
-```
-
-### Developing a Plugin
-
-Configure the volume to load the plugin in the container in the `docker-compose.yml`:
-
-```
-volumes:
-  - ./plugin-name/trunk/:/var/www/html/wp-content/plugins/plugin-name
 ```
 
 ### WP CLI
@@ -143,14 +152,15 @@ docker-compose run --rm wpcli plugin list
 Or to search-replace:
 
 ```
-docker-compose run --rm wpcli search-replace 'mysite.com' 'mysite.test'
+docker-compose run --rm wpcli search-replace 'http://mysite.com' 'http://wp-app.local'
 ```
+Create new admin user
 
 ```
-docker-compose run --rm wpcli user create baracat baracat@example.com --role=administrator --user_pass=q1w2e3r4+
+docker-compose run --rm wpcli user create baracat baracat@example.com --role=administrator --user_pass=newpass
 ```
 
-For an easier usage you may consider adding an alias for the CLI:
+### For an easier usage you may consider adding an alias for the CLI:
 
 ```
 alias wp="docker-compose run --rm wpcli"
