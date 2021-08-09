@@ -146,6 +146,10 @@ Or to search-replace:
 docker-compose run --rm wpcli search-replace 'mysite.com' 'mysite.test'
 ```
 
+```
+docker-compose run --rm wpcli user create baracat baracat@example.com --role=administrator --user_pass=q1w2e3r4+
+```
+
 For an easier usage you may consider adding an alias for the CLI:
 
 ```
